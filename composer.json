@@ -1,0 +1,6 @@
+{
+    "name": "kleijweg/rick-and-morty-case",
+    "description": "PHP implementation of https://github.com/graciousagency/rick-and-morty-case",
+    "type": "project",
+    "require": {}
+}
