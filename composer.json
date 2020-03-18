@@ -2,5 +2,8 @@
     "name": "kleijweg/rick-and-morty-case",
     "description": "PHP implementation of https://github.com/graciousagency/rick-and-morty-case",
     "type": "project",
-    "require": {}
+    "require": {
+        "symfony/console": "^5.0",
+        "guzzlehttp/guzzle": "^6.5"
+    }
 }
