@@ -1,0 +1,257 @@
+# config/services.yaml
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+  console-application:
+    class: Symfony\Component\Console\Application
+    calls:
+      - [add, ['@ListCharactersCommand']]
+      - [add, ['@ListEpisodesCommand']]
+      - [add, ['@ListLocationsCommand']]
+      - [add, ['@ShowCharacterCommand']]
+      - [add, ['@ShowEpisodeCommand']]
+      - [add, ['@ShowLocationCommand']]
+      - [add, ['@SearchCharacterCommand']]
+      - [add, ['@SearchEpisodeCommand']]
+      - [add, ['@SearchLocationCommand']]
+      - [add, ['@ClearCacheCommand']]
+    public: true
+  App\:
+    resource: '../src/*'
+
+# Symfony I/O
+  Symfony\Component\Console\Input\InputInterface:
+    class: Symfony\Component\Console\Input\ArgvInput
+    public: true
+  Symfony\Component\Console\Output\OutputInterface:
+    class: Symfony\Component\Console\Output\ConsoleOutput
+    public: true
+  Symfony\Component\Console\Style\OutputStyle:
+    class: Symfony\Component\Console\Style\SymfonyStyle
+    public: true
+
+# API client caching setup
+  MiddlewareStack:
+    class: GuzzleHttp\HandlerStack
+    factory: [GuzzleHttp\HandlerStack, create]
+    calls:
+      - [push, ['@CacheMiddleware']]
+  CacheMiddleware:
+    class: Kevinrob\GuzzleCache\CacheMiddleware
+    arguments: ['@PrivateCacheStrategy']
+  PrivateCacheStrategy:
+    class: Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy
+    arguments: ['@FlysystemStorage']
+  FlysystemStorage:
+    class: Kevinrob\GuzzleCache\Storage\FlysystemStorage
+    arguments: ['@LocalStorageAdapter']
+  LocalStorageAdapter:
+    class: League\Flysystem\Adapter\Local
+    arguments: ['cache/http']
+
+# The API client itself
+  ApiClient:
+    class: GuzzleHttp\Client
+    arguments:
+      $config:
+        base_uri: https://rickandmortyapi.com/api/
+        verify: false
+        handler: '@MiddlewareStack'
+
+# commands
+  ClearCacheCommand:
+    class: App\Command\ClearCache
+    arguments:
+      $adapter: '@LocalStorageAdapter'
+    calls:
+      - [setName, ['cache:clear']]
+      - [setDescription, ['Clear the request cache']]
+      - [setHelp, ['Clear the request cache']]
+  ListCharactersCommand:
+    class: App\Command\Listing
+    arguments:
+      $client: '@CharacterEndpoint'
+      $renderer: '@CharacterRenderer'
+      $messages: '%messages.character.list%'
+    calls:
+      - [setName, ['character:list']]
+      - [setDescription, ['List characters']]
+      - [setHelp, ['Lists all characters']]
+  ListEpisodesCommand:
+    class: App\Command\Listing
+    arguments:
+      $client: '@EpisodeEndpoint'
+      $renderer: '@EpisodeRenderer'
+      $messages: '%messages.episode.list%'
+    calls:
+      - [setName, ['episode:list']]
+      - [setDescription, ['List episodes']]
+      - [setHelp, ['Lists all episodes']]
+  ListLocationsCommand:
+    class: App\Command\Listing
+    arguments:
+      $client: '@LocationEndpoint'
+      $renderer: '@LocationRenderer'
+      $messages: '%messages.location.list%'
+    calls:
+      - [setName, ['location:list']]
+      - [setDescription, ['List locations']]
+      - [setHelp, ['List all locations']]
+  ShowCharacterCommand:
+    class: App\Command\Show
+    arguments:
+      $client: '@CharacterEndpoint'
+      $renderer: '@CharacterRenderer'
+      $messages: '%messages.character.show%'
+    calls:
+      - [setName, ['character:show']]
+      - [setDescription, ['Show a character']]
+      - [setHelp, ['Show a character by its ID']]
+      - [addArgument, ['id', 1, 'ID of the character']]
+  ShowEpisodeCommand:
+    class: App\Command\Show
+    arguments:
+      $client: '@EpisodeEndpoint'
+      $renderer: '@EpisodeRenderer'
+      $messages: '%messages.episode.show%'
+    calls:
+      - [setName, ['episode:show']]
+      - [setDescription, ['Show an episode']]
+      - [setHelp, ['Show an episode by its ID']]
+      - [addArgument, ['id', 1, 'ID of the episode']]
+  ShowLocationCommand:
+    class: App\Command\Show
+    arguments:
+      $client: '@LocationEndpoint'
+      $renderer: '@LocationRenderer'
+      $messages: '%messages.location.show%'
+    calls:
+      - [setName, ['location:show']]
+      - [setDescription, ['Show a location']]
+      - [setHelp, ['Show a location']]
+      - [addArgument, ['id', 1, 'ID of the location']]
+  SearchCharacterCommand:
+    class: App\Command\Search
+    arguments:
+      $search: '@SearchCharactersService'
+      $renderer: '@CharacterRenderer'
+      $messages: '%messages.character.search%'
+    calls:
+      - [setName, ['character:search']]
+      - [setDescription, ['Search for characters']]
+      - [setHelp, ['Search for characters']]
+  SearchEpisodeCommand:
+    class: App\Command\Search
+    arguments:
+      $search: '@SearchEpisodesService'
+      $renderer: '@EpisodeRenderer'
+      $messages: '%messages.episode.search%'
+    calls:
+      - [setName, ['episode:search']]
+      - [setDescription, ['Search for episodes']]
+      - [setHelp, ['Search for episodes']]
+  SearchLocationCommand:
+    class: App\Command\Search
+    arguments:
+      $search: '@SearchLocationsService'
+      $renderer: '@LocationRenderer'
+      $messages: '%messages.location.search%'
+    calls:
+      - [setName, ['location:search']]
+      - [setDescription, ['Search for locations']]
+      - [setHelp, ['Search for locations']]
+
+# search services
+  SearchCharactersService:
+    class: App\Service\Search
+    arguments:
+      $clients:
+        - '@CharacterEndpoint'
+        - '@EpisodeEndpoint'
+        - '@LocationEndpoint'
+      $propertyMapping:
+        location: residents
+        episode: characters
+  SearchEpisodesService:
+    class: App\Service\Search
+    arguments:
+      $clients:
+        - '@EpisodeEndpoint'
+        - '@CharacterEndpoint'
+      $propertyMapping:
+        character: episode
+  SearchLocationsService:
+    class: App\Service\Search
+    arguments:
+      $clients:
+        - '@LocationEndpoint'
+        - '@CharacterEndpoint'
+      $propertyMapping:
+        character: location
+
+# endpoints
+  CharacterEndpoint:
+    class: App\API\Client
+    arguments:
+      $httpClient: '@ApiClient'
+      $endpoint: character
+      $resultFactory: '@CharacterResultFactory'
+      $allowedFilters:
+        - name
+        - status
+        - species
+        - type
+        - gender
+  EpisodeEndpoint:
+    class: App\API\Client
+    arguments:
+      $httpClient: '@ApiClient'
+      $endpoint: episode
+      $resultFactory: '@EpisodeResultFactory'
+      $allowedFilters:
+        - name
+        - episode
+  LocationEndpoint:
+    class: App\API\Client
+    arguments:
+      $httpClient: '@ApiClient'
+      $endpoint: location
+      $resultFactory: '@LocationResultFactory'
+      $allowedFilters:
+        - name
+        - type
+        - dimension
+
+# result factories
+  CharacterResultFactory:
+    class: App\API\ResultFactory
+    arguments:
+      $modelClass: App\Model\Character
+
+  EpisodeResultFactory:
+    class: App\API\ResultFactory
+    arguments:
+      $modelClass: App\Model\Episode
+  LocationResultFactory:
+    class: App\API\ResultFactory
+    arguments:
+      $modelClass: App\Model\Location
+
+# renderers
+  CharacterRenderer:
+    class: App\Renderer\ModelRenderer
+    arguments:
+      $style: '@Symfony\Component\Console\Style\OutputStyle'
+      $mapping: '%render.character%'
+  EpisodeRenderer:
+    class: App\Renderer\ModelRenderer
+    arguments:
+      $style: '@Symfony\Component\Console\Style\OutputStyle'
+      $mapping: '%render.episode%'
+  LocationRenderer:
+    class: App\Renderer\ModelRenderer
+    arguments:
+      $style: '@Symfony\Component\Console\Style\OutputStyle'
+      $mapping: '%render.location%'

@@ -1,16 +1,25 @@
 <?php
 
 
-namespace Kleijweg\RickAndMortyCase\Model;
+namespace App\API;
 
+use App\Traits\GetSetTrait;
 
 /**
  * Class Info
- * @package Kleijweg\RickAndMortyCase\Model
- * @link https://rickandmortyapi.com/documentation/#info-and-pagination
+ *
+ * @package App\API
  */
-class Info
+class Info implements ResultInterface
 {
+    use GetSetTrait;
+
+    /**
+     * The number of items in pages.
+     * This is hardcoded on the server.
+     */
+    private const ITEMS_PER_PAGE = 20;
+
     /**
      * The length of the response
      *
@@ -40,7 +49,17 @@ class Info
     protected $prev;
 
     /**
-     * Get the length of the response
+     * Info constructor.
+     *
+     * @param array<mixed> $data
+     */
+    public function __construct(array $data)
+    {
+        $this->setData($data);
+    }
+
+    /**
+     * Get the length of the response.
      *
      * @return int
      */
@@ -50,9 +69,9 @@ class Info
     }
 
     /**
-     * Set the length of the response
+     * Set the length of the response.
      *
-     * @param int $count
+     * @param  int $count
      * @return self
      */
     public function setCount(int $count): self
@@ -62,7 +81,7 @@ class Info
     }
 
     /**
-     * Get the amount of pages
+     * Get the amount of pages.
      *
      * @return int
      */
@@ -72,9 +91,9 @@ class Info
     }
 
     /**
-     * Set the amount of pages
+     * Set the amount of pages.
      *
-     * @param int $pages
+     * @param  int $pages
      * @return self
      */
     public function setPages(int $pages): self
@@ -96,7 +115,7 @@ class Info
     /**
      * Set the link to the next page
      *
-     * @param string $next
+     * @param  string $next
      * @return self
      */
     public function setNext(string $next): self
@@ -118,7 +137,7 @@ class Info
     /**
      * Set the link to the previous page
      *
-     * @param string $prev
+     * @param  string $prev
      * @return self
      */
     public function setPrev(string $prev): self

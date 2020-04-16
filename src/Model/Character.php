@@ -1,22 +1,10 @@
 <?php
 
 
-namespace Kleijweg\RickAndMortyCase\Model;
+namespace App\Model;
 
+use InvalidArgumentException;
 
-/**
- * Class Character
- * @package Kleijweg\RickAndMortyCase\Model
- * @link https://rickandmortyapi.com/documentation/#character-schema
- * @method int      getId()                     Get the id of the character
- * @method self     setId(int $id)              Set the id of the character
- * @method string   getName()                   Get the name of the character
- * @method self     setName(string $name)       Set the name of the character
- * @method string   getUrl()                    Get the link to the character's own URL endpoint
- * @method self     setUrl(string $url)         Set the link to the character's own URL endpoint
- * @method string   getCreated()                Get the time at which the character was created in the database
- * @method self     setCreated(string $created) Set the time at which the character was created in the database
- */
 class Character extends AbstractModel
 {
     public const STATUS_UNKNOWN    = 'unknown';
@@ -26,6 +14,25 @@ class Character extends AbstractModel
     public const GENDER_FEMALE     = 'Female';
     public const GENDER_MALE       = 'Male';
     public const GENDER_GENDERLESS = 'Genderless';
+
+    /**
+     * Valid statuses
+     */
+    public const AVAILABLE_STATUSES = [
+        self::STATUS_UNKNOWN,
+        self::STATUS_ALIVE,
+        self::STATUS_DEAD,
+    ];
+
+    /**
+     * Valid genders
+     */
+    public const AVAILABLE_GENDERS = [
+        self::GENDER_UNKNOWN,
+        self::GENDER_FEMALE,
+        self::GENDER_MALE,
+        self::GENDER_GENDERLESS,
+    ];
 
     /**
      * The status of the character ('Alive', 'Dead' or 'unknown').
@@ -58,14 +65,14 @@ class Character extends AbstractModel
     /**
      * Name and link to the character's origin location.
      *
-     * @var object TODO
+     * @var NamedLink|null
      */
     protected $origin;
 
     /**
      * Name and link to the character's last known location endpoint.
      *
-     * @var object
+     * @var NamedLink|null
      */
     protected $location;
 
@@ -97,11 +104,14 @@ class Character extends AbstractModel
     /**
      * Set the status of the character ('Alive', 'Dead' or 'unknown')
      *
-     * @param string $status
+     * @param  string $status
      * @return self
      */
     public function setStatus(string $status): self
     {
+        if (!in_array($status, self::AVAILABLE_STATUSES, true)) {
+            throw new InvalidArgumentException(sprintf('Invalid status "%s"', $status));
+        }
         $this->status = $status;
         return $this;
     }
@@ -119,7 +129,7 @@ class Character extends AbstractModel
     /**
      * Set the species of the character
      *
-     * @param string $species
+     * @param  string $species
      * @return self
      */
     public function setSpecies(string $species): self
@@ -141,7 +151,7 @@ class Character extends AbstractModel
     /**
      * Set the type or subspecies of the character
      *
-     * @param string $type
+     * @param  string $type
      * @return self
      */
     public function setType(string $type): self
@@ -163,11 +173,14 @@ class Character extends AbstractModel
     /**
      * Set the gender of the character ('Female', 'Male', 'Genderless' or 'unknown')
      *
-     * @param string $gender
+     * @param  string $gender
      * @return self
      */
     public function setGender(string $gender): self
     {
+        if (!in_array($gender, self::AVAILABLE_GENDERS, true)) {
+            throw new InvalidArgumentException(sprintf('Invalid gender "%s"', $gender));
+        }
         $this->gender = $gender;
         return $this;
     }
@@ -175,9 +188,9 @@ class Character extends AbstractModel
     /**
      * Get the name and link to the character's origin location
      *
-     * @return object
+     * @return NamedLink|null
      */
-    public function getOrigin(): object
+    public function getOrigin(): ?NamedLink
     {
         return $this->origin;
     }
@@ -185,21 +198,21 @@ class Character extends AbstractModel
     /**
      * Set the name and link to the character's origin location
      *
-     * @param object $origin
+     * @param  NamedLink|array<string> $origin
      * @return self
      */
-    public function setOrigin(object $origin): self
+    public function setOrigin($origin): self
     {
-        $this->origin = $origin;
+        $this->origin = $origin instanceof NamedLink ? $origin : new NamedLink($origin);
         return $this;
     }
 
     /**
      * Get the name and link to the character's last known location endpoint
      *
-     * @return object
+     * @return NamedLink|null
      */
-    public function getLocation(): object
+    public function getLocation(): ?NamedLink
     {
         return $this->location;
     }
@@ -207,12 +220,12 @@ class Character extends AbstractModel
     /**
      * Set the name and link to the character's last known location endpoint
      *
-     * @param object $location
+     * @param  NamedLink|array<string> $location
      * @return self
      */
-    public function setLocation(object $location): self
+    public function setLocation($location): self
     {
-        $this->location = $location;
+        $this->location = $location instanceof NamedLink ? $location: new NamedLink($location);
         return $this;
     }
 
@@ -229,7 +242,7 @@ class Character extends AbstractModel
     /**
      * Set the link to the character's image
      *
-     * @param string $image
+     * @param  string $image
      * @return self
      */
     public function setImage(string $image): self
@@ -251,7 +264,7 @@ class Character extends AbstractModel
     /**
      * Set the list of episodes in which this character appeared
      *
-     * @param array|string[] $episode
+     * @param  array|string[] $episode
      * @return self
      */
     public function setEpisode(array $episode): self

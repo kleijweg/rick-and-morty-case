@@ -1,0 +1,10 @@
+#TODO CLEANUP
+parameters:
+    excludes_analyse:
+#        - %currentWorkingDirectory%/bin/di.php
+        - %currentWorkingDirectory%/cache/*
+#        - %currentWorkingDirectory%/public/*
+        - %currentWorkingDirectory%/vendor/*
+#        - %currentWorkingDirectory%/src/Stage/Transform/MapConfigurableOptions.php
+#        - %currentWorkingDirectory%/config/xslt*
+    ignoreErrors:

@@ -1,0 +1,83 @@
+parameters:
+# rendering mappings
+  render.character:
+    # the 'name' property is used as title
+    title: name
+    properties:
+      # property name: label
+      status: Status
+      species: Species
+      type: Type
+      gender: Gender
+      origin: Origin
+      location: Location
+      image: Image
+      url: Link
+      episode: Episodes
+  render.episode:
+    title: name
+    properties:
+      air_date: Air date
+      episode: Episode
+      url: Link
+      characters: Characters
+  render.location:
+    title: name
+    properties:
+      type: Type
+      dimension: Dimension
+      created: Created
+      url: Link
+      residents: Residents
+# command messages
+  messages.character.show:
+    output_as_json: Output the character as JSON
+  messages.episode.show:
+    output_as_json: Output the episode as JSON
+  messages.location.show:
+    output_as_json: Output the location as JSON
+  messages.character.list:
+    filter_by_property: Filter characters by %s
+    loading_items: Loading characters
+    items_loaded: All characters loaded.
+    loading_from_endpoint: Loading characters
+    output_as_json: Output characters as JSON
+    no_items_found: No characters found
+  messages.episode.list:
+    filter_by_property: Filter episodes by %s
+    loading_items: Loading episodes
+    items_loaded: All episodes loaded.
+    loading_from_endpoint: Loading episodes
+    output_as_json: Output episodes as JSON
+    no_items_found: No episodes found
+  messages.location.list:
+    filter_by_property: Filter locations by %s
+    loading_items: Loading locations
+    items_loaded: All locations loaded.
+    loading_from_endpoint: Loading locations
+    output_as_json: Output locations as JSON
+    no_items_found: No locations found
+  messages.character.search:
+    filter_by_property: Filter characters by %s
+    loading_items: Loading characters
+    items_loaded: All characters loaded.
+    filter_by_endpoint_property: Filter by %s %s
+    loading_from_endpoint: Loading from %s endpoint
+    output_as_json: Output character(s) as JSON
+    no_items_found: No characters found
+  messages.episode.search:
+    filter_by_property: Filter episodes by %s
+    loading_items: Loading episodes
+    items_loaded: All episodes loaded.
+    filter_by_endpoint_property: Filter by %s %s
+    loading_from_endpoint: Loading from %s endpoint
+    output_as_json: Output episode(s) as JSON
+    no_items_found: No episodes found
+  messages.location.search:
+    filter_by_property: Filter locations by %s
+    loading_items: Loading locations
+    items_loaded: All locations loaded.
+    filter_by_endpoint_property: Filter by %s %s
+    loading_from_endpoint: Loading from %s endpoint
+    output_as_json: Output locations as JSON
+    no_items_found: No locations found

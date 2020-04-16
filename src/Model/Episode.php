@@ -1,22 +1,8 @@
 <?php
 
 
-namespace Kleijweg\RickAndMortyCase\Model;
+namespace App\Model;
 
-
-/**
- * Class Episode
- * @package Kleijweg\RickAndMortyCase\Model
- * @link https://rickandmortyapi.com/documentation/#episode-schema
- * @method int      getId()                     Get the id of the episode
- * @method self     setId(int $id)              Set the id of the episode
- * @method string   getName()                   Get the name of the episode
- * @method self     setName(string $name)       Set the name of the episode
- * @method string   getUrl()                    Get the link to the episode's own endpoint.
- * @method self     setUrl(string $url)         Get the link to the episode's own endpoint.
- * @method string   getCreated()                Get the time at which the episode was created in the database
- * @method self     setCreated(string $created) Set the time at which the episode was created in the database
- */
 class Episode extends AbstractModel
 {
     /**
@@ -53,7 +39,7 @@ class Episode extends AbstractModel
     /**
      * Set the air date of the episode
      *
-     * @param string $air_date
+     * @param  string $air_date
      * @return self
      */
     public function setAirDate(string $air_date): self
@@ -75,7 +61,7 @@ class Episode extends AbstractModel
     /**
      * Set the code of the episode
      *
-     * @param string $episode
+     * @param  string $episode
      * @return self
      */
     public function setEpisode(string $episode): self
@@ -97,7 +83,7 @@ class Episode extends AbstractModel
     /**
      * Set the list of characters who have been seen in the episode
      *
-     * @param array|string[] $characters
+     * @param  array|string[] $characters
      * @return self
      */
     public function setCharacters($characters): self

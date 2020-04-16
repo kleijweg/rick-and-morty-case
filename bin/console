@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+require __DIR__.'/../vendor/autoload.php';
+
+$isDebug = true;
+
+$file = __DIR__ .'/../cache/container.php';
+$containerConfigCache = new ConfigCache($file, $isDebug);
+
+if (!$containerConfigCache->isFresh()) {
+    $containerBuilder = new ContainerBuilder();
+    $loader = new YamlFileLoader($containerBuilder, new FileLocator(__DIR__ . '/../config'));
+    $loader->load('parameters.yaml');
+    $loader->load('services.yaml');
+
+    $containerBuilder->compile();
+
+    $dumper = new PhpDumper($containerBuilder);
+    $containerConfigCache->write(
+        $dumper->dump(['class' => 'ServiceContainer']),
+        $containerBuilder->getResources()
+    );
+}
+
+require_once $file;
+$container = new ServiceContainer;
+$container
+    ->get('console-application')
+    ->run(
+        $container->get(InputInterface::class),
+        $container->get(OutputInterface::class)
+    );
